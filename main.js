@@ -5,7 +5,12 @@ function isPangram(sentence) {
 }
 
 function wordFrequency(text) {
-  const words = text.split(" ");
+  const validated = text
+                      .toLowerCase()
+                      .split('')
+                      .filter(el => el.match(/[a-z ]/))
+                      .join('')
+  const words = validated.split(" ");
   const map = new Map();
 
   for (let word of words) {
@@ -18,14 +23,12 @@ function wordFrequency(text) {
     map.set(word, 1);
   }
 
-  const sorted = Array.from(map).sort((a, b) => b[1] - a[1]);
+  const sorted = Array.from(map).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
   const TOP = 3;
 
   let top = sorted.slice(0, TOP);
-
   return top
           .map(item => item.join('='))
-          .sort()
           .join(', ');
 }
