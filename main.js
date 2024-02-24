@@ -20,9 +20,16 @@ function wordFrequency(text) {
 
   const sorted = Array.from(map).sort((a, b) => b[1] - a[1]);
 
-  console.log(sorted.slice(0, 3));
+  const TOP = 3;
+
+  let top = sorted.slice(0, TOP);
+
+  return top
+          .map(item => item.join('='))
+          .sort()
+          .join(', ');
 }
 
-wordFrequency(
+console.log(wordFrequency(
   "This is a sample text. It is just a sample to demonstrate word frequency analysis."
-);
+));
