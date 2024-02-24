@@ -29,7 +29,3 @@ function wordFrequency(text) {
           .sort()
           .join(', ');
 }
-
-console.log(wordFrequency(
-  "This is a sample text. It is just a sample to demonstrate word frequency analysis."
-));
