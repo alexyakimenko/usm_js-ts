@@ -101,7 +101,6 @@ class TransactionAnalyzer {
     );
   }
 
-
   findMostTransactionsMonth(type) {
     const month = [
       "January",
