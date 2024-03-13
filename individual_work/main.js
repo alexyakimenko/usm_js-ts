@@ -40,7 +40,22 @@ class TransactionAnalyzer {
     );
   }
 
-  calculateTotalAmountByDate(year, month, day) {} // to be clarified!
+  calculateTotalAmountByDate(year, month, day) {
+    return transactions.reduce((sum, transaction) => {
+      const transactionDate = new Date(transaction.transaction_date)
+
+      if (
+        (year && year !== transactionDate.getFullYear()) ||
+        (month && month !== transactionDate.getMonth() + 1) ||
+        (day && day !== transactionDate.getDate())
+      ) {
+        return sum;
+      }
+
+      return sum + transaction.transaction_amount;
+
+    }, 0)
+  } 
 
   getTransactionsByType(type) {
     return transactions.filter(
@@ -86,7 +101,8 @@ class TransactionAnalyzer {
     );
   }
 
-  findMostTransactionsMonth() {
+
+  findMostTransactionsMonth(type) {
     const month = [
       "January",
       "February",
@@ -105,8 +121,9 @@ class TransactionAnalyzer {
     const map = new Map();
 
     for (let transaction of transactions) {
+      if (type && transaction.transaction_type !== type) continue;
       const transactionMonth =
-        month[new Date(transaction.transaction_date).getMonth()];
+        this.month[new Date(transaction.transaction_date).getMonth()];
 
       if (map.has(transactionMonth)) {
         let count = map.get(transactionMonth);
@@ -121,41 +138,8 @@ class TransactionAnalyzer {
     return sorted[0][0];
   }
 
-  // todo: reduce boilerplate
   findMostDebitTransactionsMonth() {
-    const month = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const map = new Map();
-
-    for (let transaction of transactions) {
-      if (transaction.transaction_type !== "debit") continue;
-      const transactionMonth =
-        month[new Date(transaction.transaction_date).getMonth()];
-
-      if (map.has(transactionMonth)) {
-        let count = map.get(transactionMonth);
-        map.set(transactionMonth, count + 1);
-        continue;
-      }
-      map.set(transactionMonth, 1);
-    }
-
-    const sorted = Array.from(map).sort((a, b) => b[1] - a[1]);
-
-    return sorted[0][0];
+    return this.findMostTransactionsMonth("debit");
   }
 
   mostTransactionTypes() {
@@ -194,11 +178,6 @@ class TransactionAnalyzer {
       (transaction) => transaction.transaction_description
     );
   }
-
-  test() {
-    console.log(transactions[0].string());
-  }
 }
 
 const analyzer = new TransactionAnalyzer(transactions);
-console.log(analyzer.test());
