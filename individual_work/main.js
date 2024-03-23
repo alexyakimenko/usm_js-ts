@@ -1,182 +1,56 @@
 const transactions = require("./transaction.json");
-
-const Stringify = {
-  string: function () {
-    return JSON.stringify(this);
-  },
-};
-
-class TransactionAnalyzer {
-  #transactions = [];
-
-  constructor(transactions) {
-    this.#transactions = transactions;
-
-    for (let transaction of this.#transactions) {
-      Object.setPrototypeOf(transaction, Stringify);
-    }
-  }
-
-  addTransaction(transaction) {
-    transactions.push(transaction);
-  }
-
-  getAllTransactions() {
-    return transactions;
-  }
-
-  getUniqueTransactionType() {
-    const transactionTypes = new Set();
-    for (let transaction of transactions) {
-      transactionTypes.add(transaction.transaction_type);
-    }
-    return Array.from(transactionTypes);
-  }
-
-  calculateTotalAmount() {
-    return transactions.reduce(
-      (sum, transaction) => sum + transaction.transaction_amount,
-      0
-    );
-  }
-
-  calculateTotalAmountByDate(year, month, day) {
-    return transactions.reduce((sum, transaction) => {
-      const transactionDate = new Date(transaction.transaction_date)
-
-      if (
-        (year && year !== transactionDate.getFullYear()) ||
-        (month && month !== transactionDate.getMonth() + 1) ||
-        (day && day !== transactionDate.getDate())
-      ) {
-        return sum;
-      }
-
-      return sum + transaction.transaction_amount;
-
-    }, 0)
-  } 
-
-  getTransactionsByType(type) {
-    return transactions.filter(
-      (transaction) => transaction.transaction_type === type
-    );
-  }
-
-  getTransactionsInDateRange(startDate, endDate) {
-    return transactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.transaction_date);
-      return (
-        transactionDate.getTime() > startDate.getTime() &&
-        transactionDate.getTime() < endDate.getTime()
-      );
-    });
-  }
-
-  getTransactionsByMerchant(merchantName) {
-    return transactions.filter(
-      (transaction) => transaction.merchant_name === merchantName
-    );
-  }
-
-  calculateAverageTransactionAmount() {
-    return this.calculateTotalAmount() / transactions.length;
-  }
-
-  getTransactionsByAmountRange(minAmount, maxAmount) {
-    return transactions.filter(
-      (transaction) =>
-        transaction.transaction_amount >= minAmount &&
-        transaction.transaction_amount <= maxAmount
-    );
-  }
-
-  calculateTotalDebitAmount() {
-    return transactions.reduce(
-      (sum, transaction) =>
-        transaction.transaction_type === "debit"
-          ? sum + transaction.transaction_amount
-          : sum,
-      0
-    );
-  }
-
-  findMostTransactionsMonth(type) {
-    const month = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const map = new Map();
-
-    for (let transaction of transactions) {
-      if (type && transaction.transaction_type !== type) continue;
-      const transactionMonth =
-        this.month[new Date(transaction.transaction_date).getMonth()];
-
-      if (map.has(transactionMonth)) {
-        let count = map.get(transactionMonth);
-        map.set(transactionMonth, count + 1);
-        continue;
-      }
-      map.set(transactionMonth, 1);
-    }
-
-    const sorted = Array.from(map).sort((a, b) => b[1] - a[1]);
-
-    return sorted[0][0];
-  }
-
-  findMostDebitTransactionsMonth() {
-    return this.findMostTransactionsMonth("debit");
-  }
-
-  mostTransactionTypes() {
-    const map = new Map();
-
-    for (let transaction of transactions) {
-      const type = transaction.transaction_type;
-      if (map.has(type)) {
-        let count = map.get(type);
-        map.set(type, count + 1);
-        continue;
-      }
-      map.set(type, 1);
-    }
-
-    const sorted = Array.from(map).sort((a, b) => b[1] - a[1]);
-
-    return sorted[0][0];
-  }
-
-  getTransactionsBeforeDate(date) {
-    return transactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.transaction_date);
-      return transactionDate.getTime() < date.getTime();
-    });
-  }
-
-  findTransactionById(id) {
-    return transactions.find(
-      (transaction) => transaction.transaction_id === id
-    );
-  }
-
-  mapTransactionDescriptions() {
-    return transactions.map(
-      (transaction) => transaction.transaction_description
-    );
-  }
-}
+const {TransactionAnalyzer} = require("./TransactionAnalyzer");
 
 const analyzer = new TransactionAnalyzer(transactions);
+
+const transaction = {
+  transaction_id: "121",
+  transaction_date: "2023-04-30",
+  transaction_amount: 250.0,
+  transaction_type: "debit",
+  transaction_description: "Home office supplies and ...",
+  merchant_name: "OfficeSupplyStoreABCDEFG",
+  card_type: "Apex"
+}
+
+analyzer.addTransaction(transaction)
+// console.log(analyzer.getAllTransactions())
+
+console.log("Unique Types:", analyzer.getUniqueTransactionType());
+console.log("Total Amount:", analyzer.calculateTotalAmount())
+console.log("Total Amount By Date (April 2019):", analyzer.calculateTotalAmountByDate(2019, 4))
+
+// console.log("Transactions By Type:")
+// console.log(analyzer.getTransactionsByType("credit"))
+
+// console.log("Transactions in Date Range:")
+// console.log(
+//   analyzer.getTransactionsInDateRange(
+//     new Date("2019-03-01"),
+//     new Date("2019-05-01")
+//   )
+// )
+
+console.log("Transactions By Merchant:")
+console.log(analyzer.getTransactionsByMerchant("officesupplystoreabcdefg"))
+
+console.log("Average Transaction Amount:", analyzer.calculateAverageTransactionAmount(3))
+
+// console.log(("Transactions By Amount Range:"));
+// console.log(analyzer.getTransactionsByAmountRange(50, 500))
+
+console.log("Total Debit Amount:", analyzer.calculateTotalDebitAmount())
+console.log("Most Transactions Month:", analyzer.findMostTransactionsMonth())
+console.log("Most Debit Transactions Month:", analyzer.findMostDebitTransactionsMonth())
+
+console.log("Most Transactions Type:", analyzer.mostTransactionsType())
+// console.log("Transactions Before Date:")
+// console.log(analyzer.getTransactionsBeforeDate(
+//   new Date("2019-02-01")
+// ))
+
+console.log("Transaction By Id:")
+console.log(analyzer.findTransactionById(121))
+
+console.log("Transaction Descriptions:")
+console.log(analyzer.mapTransactionDescriptions().slice(0, 10))
