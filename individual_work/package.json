@@ -1,0 +1,17 @@
+{
+  "name": "individual_work",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "docs": "rmdir-cli ./docs && jsdoc -d ./docs src/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jsdoc": "^4.0.2",
+    "rmdir-cli": "^2.0.6"
+  }
+}
